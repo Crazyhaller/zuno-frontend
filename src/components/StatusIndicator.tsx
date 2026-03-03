@@ -9,28 +9,41 @@ export const StatusIndicator: React.FC<StatusIndicatorProps> = ({ status }) => {
   const getConfig = () => {
     switch (status) {
       case 'connected':
-        return { color: 'bg-green-400', text: 'Live Connected' }
+        return {
+          dotClass: 'text-emerald-400 bg-emerald-400',
+          text: 'Live Connected',
+        }
       case 'connecting':
-        return { color: 'bg-yellow-400', text: 'Connecting...' }
+        return {
+          dotClass: 'text-sky-300 bg-sky-300',
+          text: 'Connecting...',
+        }
       case 'reconnecting':
-        return { color: 'bg-orange-400', text: 'Reconnecting...' }
+        return {
+          dotClass: 'text-amber-300 bg-amber-300',
+          text: 'Reconnecting...',
+        }
       case 'error':
-        return { color: 'bg-red-500', text: 'Live Updates Unavailable' }
+        return {
+          dotClass: 'text-rose-400 bg-rose-400',
+          text: 'Live Updates Unavailable',
+        }
       default:
-        return { color: 'bg-gray-300', text: 'Offline' }
+        return {
+          dotClass: 'text-slate-400 bg-slate-400',
+          text: 'Offline',
+        }
     }
   }
 
   const config = getConfig()
 
   return (
-    <div className="flex items-center gap-2 bg-white px-3 py-1.5 rounded-lg border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+    <div className="status-chip flex items-center gap-2 px-4 py-2 text-xs font-semibold tracking-[0.08em] uppercase">
       <div
-        className={`w-3 h-3 rounded-full border border-black ${config.color} ${status === 'reconnecting' ? 'animate-pulse' : ''}`}
+        className={`status-dot ${config.dotClass} ${status === 'reconnecting' ? 'pulse' : ''}`}
       />
-      <span className="text-xs font-bold uppercase tracking-wide">
-        {config.text}
-      </span>
+      <span>{config.text}</span>
     </div>
   )
 }

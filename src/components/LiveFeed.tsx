@@ -5,6 +5,7 @@ interface LiveFeedProps {
   messages: Commentary[]
   isActive: boolean
   isLoading?: boolean
+  isFinishedMatch?: boolean
 }
 
 const formatMinute = (minute?: number) => {
@@ -29,14 +30,15 @@ export const LiveFeed: React.FC<LiveFeedProps> = ({
   messages,
   isActive,
   isLoading,
+  isFinishedMatch,
 }) => {
   if (!isActive) {
     return (
-      <div className="h-full flex flex-col items-center justify-center text-center p-8 bg-gray-50 border-2 border-black rounded-2xl border-dashed">
-        <div className="w-16 h-16 bg-brand-yellow rounded-full border-2 border-black flex items-center justify-center mb-4">
+      <div className="panel-surface h-full rounded-3xl border border-dashed border-blue-300/40 p-8 text-center">
+        <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl border border-blue-300/50 bg-blue-500/20 shadow-[0_0_26px_rgba(65,132,255,0.35)]">
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            className="h-8 w-8"
+            className="h-8 w-8 text-blue-100"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -49,8 +51,10 @@ export const LiveFeed: React.FC<LiveFeedProps> = ({
             />
           </svg>
         </div>
-        <h3 className="font-bold text-xl mb-2">No Match Selected</h3>
-        <p className="text-gray-500 max-w-xs">
+        <h3 className="display-font mb-2 text-xl font-bold tracking-wide text-blue-50">
+          No Match Selected
+        </h3>
+        <p className="mx-auto max-w-xs text-sm text-slate-400">
           Select a match from the list to view live commentary and real-time
           updates.
         </p>
@@ -59,25 +63,32 @@ export const LiveFeed: React.FC<LiveFeedProps> = ({
   }
 
   return (
-    <div className="flex flex-col h-full bg-white border-2 border-black rounded-2xl overflow-hidden shadow-hard">
-      <div className="p-4 bg-brand-blue border-b-2 border-black flex justify-between items-center">
-        <h3 className="font-bold text-lg">Live Commentary</h3>
-        <span className="text-xs bg-white px-2 py-0.5 border border-black rounded-md font-medium">
-          Real-time
+    <div className="panel-surface neon-outline flex h-full flex-col overflow-hidden rounded-3xl">
+      <div className="flex items-center justify-between border-b border-blue-300/30 bg-blue-500/10 px-5 py-4">
+        <div className="flex items-center gap-3">
+          <span className="inline-flex h-2.5 w-2.5 rounded-full bg-rose-400 shadow-[0_0_12px_rgba(251,113,133,0.95)] animate-pulse" />
+          <h3 className="display-font text-base font-bold tracking-wide text-blue-50">
+            Commentary Stream
+          </h3>
+        </div>
+        <span className="rounded-full border border-blue-300/40 bg-slate-900/55 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-200">
+          Realtime
         </span>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar">
+      <div className="feed-scroll flex-1 space-y-3 overflow-y-auto px-4 py-4 md:px-5">
         {isLoading ? (
-          <div className="text-center py-10 text-gray-400 italic">
+          <div className="py-10 text-center text-sm italic text-slate-400">
             Loading commentary...
           </div>
         ) : messages.length === 0 ? (
-          <div className="text-center py-10 text-gray-400 italic">
-            Waiting for updates...
+          <div className="py-10 text-center text-sm italic text-slate-400">
+            {isFinishedMatch
+              ? 'No recap available for this match yet.'
+              : 'Waiting for updates...'}
           </div>
         ) : (
-          messages.map((msg) => {
+          messages.map((msg, index) => {
             const timestamp = msg.createdAt
               ? new Date(msg.createdAt)
               : new Date()
@@ -86,69 +97,72 @@ export const LiveFeed: React.FC<LiveFeedProps> = ({
             return (
               <div
                 key={msg.id}
-                className="animate-in fade-in slide-in-from-top-2 duration-300"
+                className="commentary-entry"
+                style={{ animationDelay: `${Math.min(index, 10) * 38}ms` }}
               >
-                <div className="flex gap-3">
-                  <div className="flex flex-col items-center gap-1 mt-1">
-                    <div className="w-2 h-2 rounded-full bg-brand-yellow border border-black"></div>
-                    <div className="w-0.5 h-full bg-gray-200"></div>
-                  </div>
-                  <div className="pb-4">
-                    <div className="flex flex-wrap items-center gap-2 text-xs text-gray-500 mb-1">
-                      <span className="font-mono text-gray-400">
-                        {timestamp.toLocaleTimeString([], {
-                          hour: '2-digit',
-                          minute: '2-digit',
-                          second: '2-digit',
-                        })}
-                      </span>
-                      {minuteLabel && (
-                        <span className="px-2 py-0.5 bg-gray-100 border border-gray-200 rounded-full font-semibold">
-                          {minuteLabel}
+                <div className="panel-surface-soft rounded-2xl p-3.5">
+                  <div className="flex gap-3">
+                    <div className="mt-1 flex flex-col items-center gap-1">
+                      <div className="h-2.5 w-2.5 rounded-full bg-blue-300 shadow-[0_0_10px_rgba(125,192,255,0.95)]" />
+                      <div className="h-full w-px bg-blue-300/30" />
+                    </div>
+                    <div className="pb-1">
+                      <div className="mb-1.5 flex flex-wrap items-center gap-2 text-xs text-slate-400">
+                        <span className="font-mono text-slate-500">
+                          {timestamp.toLocaleTimeString([], {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            second: '2-digit',
+                          })}
                         </span>
+                        {minuteLabel && (
+                          <span className="rounded-full border border-blue-300/35 bg-blue-500/10 px-2 py-0.5 font-semibold text-blue-100">
+                            {minuteLabel}
+                          </span>
+                        )}
+                        {msg.sequence !== undefined && msg.sequence !== null && (
+                          <span className="rounded-full border border-blue-300/35 bg-blue-500/10 px-2 py-0.5 font-semibold text-blue-100">
+                            Seq {msg.sequence}
+                          </span>
+                        )}
+                        {msg.period && (
+                          <span className="rounded-full border border-slate-500/40 bg-slate-800/70 px-2 py-0.5 text-slate-300">
+                            {msg.period}
+                          </span>
+                        )}
+                        {msg.eventType && (
+                          <span className="rounded-full border border-rose-400/45 bg-rose-500/20 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-rose-100">
+                            {msg.eventType}
+                          </span>
+                        )}
+                      </div>
+                      {(msg.actor || msg.team) && (
+                        <div className="mb-2 text-xs font-semibold text-slate-300">
+                          {msg.actor ? msg.actor : 'Unknown'}
+                          {msg.team ? ` | ${msg.team}` : ''}
+                        </div>
                       )}
-                      {msg.sequence !== undefined && msg.sequence !== null && (
-                        <span className="px-2 py-0.5 bg-gray-100 border border-gray-200 rounded-full font-semibold">
-                          Seq {msg.sequence}
-                        </span>
+                      <p className="rounded-xl border border-blue-300/22 bg-slate-950/55 p-3 text-sm leading-relaxed text-slate-100">
+                        {msg.message}
+                      </p>
+                      {metadataLabel && (
+                        <div className="mt-2 rounded-md border border-slate-500/30 bg-slate-950/65 px-2 py-1 font-mono text-[11px] text-slate-400">
+                          {metadataLabel}
+                        </div>
                       )}
-                      {msg.period && (
-                        <span className="px-2 py-0.5 bg-gray-100 border border-gray-200 rounded-full">
-                          {msg.period}
-                        </span>
-                      )}
-                      {msg.eventType && (
-                        <span className="px-2 py-0.5 bg-brand-yellow border border-black rounded-full font-semibold uppercase tracking-wide text-[10px]">
-                          {msg.eventType}
-                        </span>
+                      {msg.tags && msg.tags.length > 0 && (
+                        <div className="mt-2 flex flex-wrap gap-2">
+                          {msg.tags.map((tag) => (
+                            <span
+                              key={`${msg.id}-${tag}`}
+                              className="rounded-full border border-blue-300/30 bg-blue-500/10 px-2 py-0.5 text-[10px] uppercase tracking-[0.09em] text-blue-100"
+                            >
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
                       )}
                     </div>
-                    {(msg.actor || msg.team) && (
-                      <div className="text-xs font-semibold text-gray-700 mb-2">
-                        {msg.actor ? msg.actor : 'Unknown'}
-                        {msg.team ? ` · ${msg.team}` : ''}
-                      </div>
-                    )}
-                    <p className="text-sm font-medium text-gray-800 leading-relaxed bg-gray-50 p-3 rounded-xl rounded-tl-none border border-gray-200">
-                      {msg.message}
-                    </p>
-                    {metadataLabel && (
-                      <div className="mt-2 text-[11px] font-mono text-gray-500 bg-white border border-gray-200 px-2 py-1 rounded">
-                        {metadataLabel}
-                      </div>
-                    )}
-                    {msg.tags && msg.tags.length > 0 && (
-                      <div className="flex flex-wrap gap-2 mt-2">
-                        {msg.tags.map((tag) => (
-                          <span
-                            key={`${msg.id}-${tag}`}
-                            className="text-[10px] uppercase tracking-wide text-gray-500 bg-white border border-gray-200 px-2 py-0.5 rounded-full"
-                          >
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
-                    )}
                   </div>
                 </div>
               </div>

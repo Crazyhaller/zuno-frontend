@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { fetchMatchCommentary, fetchMatches } from '../services/api'
-
-import { useWebSocket } from './useWebSocket'
 import type { Commentary, Match, WSMessage } from '../types'
+import { useWebSocket } from './useWebSocket'
 
 interface UseMatchData {
   matches: Match[]
@@ -48,7 +47,6 @@ export const useMatchData = (): UseMatchData => {
         setMatches((prevMatches) =>
           prevMatches.map((m) => {
             // Loose equality check for ID (string vs number)
-            // eslint-disable-next-line eqeqeq
             if (m.id == msg.matchId) {
               return {
                 ...m,
@@ -147,12 +145,6 @@ export const useMatchData = (): UseMatchData => {
         ) {
           subscribedMatchIdsRef.current.delete(matchId)
           unsubscribeMatch(match.id)
-          if (latestMatchIdRef.current == match.id) {
-            setActiveMatchId(null)
-            latestMatchIdRef.current = null
-            setCommentary([])
-            setIsCommentaryLoading(false)
-          }
         }
       })
     } catch (err) {
@@ -209,8 +201,10 @@ export const useMatchData = (): UseMatchData => {
       latestMatchIdRef.current = id
       if (activeMatchId != null && activeMatchId != id) {
         const previousId = String(activeMatchId)
-        subscribedMatchIdsRef.current.delete(previousId)
-        unsubscribeMatch(activeMatchId)
+        if (subscribedMatchIdsRef.current.has(previousId)) {
+          subscribedMatchIdsRef.current.delete(previousId)
+          unsubscribeMatch(activeMatchId)
+        }
       }
       setActiveMatchId(id)
       const matchId = String(id)

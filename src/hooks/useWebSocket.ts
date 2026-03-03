@@ -1,10 +1,4 @@
-import {
-  useState,
-  useEffect,
-  useRef,
-  useCallback,
-  useLayoutEffect,
-} from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import {
   WS_BASE_URL,
   INITIAL_RECONNECT_DELAY,
@@ -33,8 +27,6 @@ export const useWebSocket = (
 
   const normalizeId = (matchId: string | number) => String(matchId)
 
-  const initConnectionRef = useRef<(() => void) | undefined>(undefined)
-
   const sendMessage = useCallback(
     (message: WSMessage | Record<string, unknown>) => {
       if (ws.current && ws.current.readyState === WebSocket.OPEN) {
@@ -44,13 +36,33 @@ export const useWebSocket = (
     [],
   )
 
-  // Core connect function
-  const initConnection = useCallback(() => {
-    // Cleanup previous connection
-    if (ws.current) {
+  const closeCurrentSocket = useCallback((intentional = true) => {
+    const currentSocket = ws.current
+    if (!currentSocket) return
+
+    if (intentional) {
       isIntentionalClose.current = true
-      ws.current.close()
     }
+
+    ws.current = null
+
+    if (
+      currentSocket.readyState === WebSocket.OPEN ||
+      currentSocket.readyState === WebSocket.CONNECTING
+    ) {
+      currentSocket.close()
+    }
+  }, [])
+
+  // Core connect function
+  const initConnection = useCallback(function establishConnection() {
+    if (reconnectTimeout.current) {
+      clearTimeout(reconnectTimeout.current)
+      reconnectTimeout.current = null
+    }
+
+    // Cleanup previous connection
+    closeCurrentSocket(true)
 
     setStatus(reconnectAttempts.current > 0 ? 'reconnecting' : 'connecting')
     isIntentionalClose.current = false
@@ -63,6 +75,7 @@ export const useWebSocket = (
       ws.current = socket
 
       socket.onopen = () => {
+        if (ws.current !== socket) return
         setStatus('connected')
         reconnectAttempts.current = 0
         if (subscribedMatchIdsRef.current.size > 0) {
@@ -77,6 +90,7 @@ export const useWebSocket = (
       }
 
       socket.onmessage = (event) => {
+        if (ws.current !== socket) return
         try {
           const data = JSON.parse(event.data)
           onMessage(data)
@@ -86,6 +100,7 @@ export const useWebSocket = (
       }
 
       socket.onerror = () => {
+        if (ws.current !== socket) return
         // WebSocket error events are generic in browsers and don't contain descriptive messages.
         // We log it to indicate an issue occurred.
         console.warn('[WebSocket] Connection error occurred')
@@ -97,6 +112,9 @@ export const useWebSocket = (
       }
 
       socket.onclose = (event) => {
+        if (ws.current !== socket) return
+        ws.current = null
+
         if (!isIntentionalClose.current) {
           setStatus('disconnected')
 
@@ -111,8 +129,9 @@ export const useWebSocket = (
           )
 
           reconnectTimeout.current = setTimeout(() => {
+            reconnectTimeout.current = null
             reconnectAttempts.current += 1
-            initConnectionRef.current?.()
+            establishConnection()
           }, delay)
         } else {
           // If closed intentionally, just set status
@@ -123,11 +142,7 @@ export const useWebSocket = (
       console.error('[WebSocket] Connection creation failed:', e)
       setStatus('error')
     }
-  }, [onMessage])
-
-  useLayoutEffect(() => {
-    initConnectionRef.current = initConnection
-  }, [initConnection])
+  }, [closeCurrentSocket, onMessage])
 
   // Public connect method
   const connectGlobal = useCallback(() => {
@@ -165,26 +180,27 @@ export const useWebSocket = (
   const disconnect = useCallback(() => {
     isIntentionalClose.current = true
 
-    if (reconnectTimeout.current) clearTimeout(reconnectTimeout.current)
-
-    if (ws.current) {
-      ws.current.close()
-      ws.current = null
+    if (reconnectTimeout.current) {
+      clearTimeout(reconnectTimeout.current)
+      reconnectTimeout.current = null
     }
 
+    closeCurrentSocket(true)
+
     setStatus('disconnected')
-  }, [])
+  }, [closeCurrentSocket])
 
   // Cleanup on unmount
   useEffect(() => {
     return () => {
       isIntentionalClose.current = true
-      if (reconnectTimeout.current) clearTimeout(reconnectTimeout.current)
-      if (ws.current) {
-        ws.current.close()
+      if (reconnectTimeout.current) {
+        clearTimeout(reconnectTimeout.current)
+        reconnectTimeout.current = null
       }
+      closeCurrentSocket(true)
     }
-  }, [])
+  }, [closeCurrentSocket])
 
   return { status, connectGlobal, subscribeMatch, unsubscribeMatch, disconnect }
 }
