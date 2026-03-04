@@ -72,7 +72,7 @@ body::after {
   border: 1px solid var(--line);
   box-shadow:
     0 0 0 1px rgba(36, 72, 133, 0.24),
-    0 24px 56px rgba(2, 8, 18, 0.52),
+    0 20px 46px rgba(2, 8, 18, 0.5),
     inset 0 0 0 1px rgba(110, 154, 255, 0.08);
   backdrop-filter: blur(14px);
 }
@@ -91,9 +91,9 @@ body::after {
 
 .neon-outline {
   box-shadow:
-    0 0 0 1px rgba(86, 133, 255, 0.4),
-    0 0 28px rgba(61, 108, 255, 0.24),
-    0 20px 48px rgba(2, 8, 18, 0.48);
+    0 0 0 1px rgba(86, 133, 255, 0.3),
+    0 0 20px rgba(61, 108, 255, 0.2),
+    0 18px 42px rgba(2, 8, 18, 0.45);
 }
 
 .neon-blue-text {
@@ -108,14 +108,18 @@ body::after {
 
 .neon-pill {
   border: 1px solid rgba(95, 146, 255, 0.42);
-  background: rgba(24, 47, 92, 0.38);
+  background: rgba(24, 47, 92, 0.3);
   color: #d3e4ff;
 }
 
 .neon-btn {
   border-radius: 0.9rem;
   border: 1px solid rgba(94, 151, 255, 0.42);
-  background: linear-gradient(150deg, rgba(39, 84, 170, 0.42), rgba(27, 57, 112, 0.68));
+  background: linear-gradient(
+    150deg,
+    rgba(39, 84, 170, 0.38),
+    rgba(27, 57, 112, 0.58)
+  );
   color: #d9e7ff;
   transition: all 220ms ease;
 }
@@ -158,6 +162,117 @@ body::after {
 
 .status-dot.pulse {
   animation: statusPulse 1.45s ease-in-out infinite;
+}
+
+.segmented-control {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  border-radius: 0.95rem;
+  border: 1px solid rgba(91, 146, 255, 0.28);
+  background: rgba(8, 18, 36, 0.64);
+  padding: 0.35rem;
+}
+
+.segmented-control-item {
+  border-radius: 0.75rem;
+  border: 1px solid transparent;
+  background: transparent;
+  padding: 0.45rem 0.85rem;
+  color: #a4b9df;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  transition: all 180ms ease;
+}
+
+.segmented-control-item:hover {
+  border-color: rgba(102, 155, 255, 0.32);
+  color: #d7e6ff;
+}
+
+.segmented-control-item.active {
+  border-color: rgba(111, 167, 255, 0.52);
+  background: linear-gradient(
+    145deg,
+    rgba(50, 98, 194, 0.34),
+    rgba(28, 61, 124, 0.58)
+  );
+  box-shadow: 0 0 14px rgba(78, 136, 255, 0.24);
+  color: #ebf3ff;
+}
+
+.product-card {
+  border-radius: 1rem;
+  border: 1px solid rgba(91, 146, 255, 0.22);
+  background: linear-gradient(
+    160deg,
+    rgba(8, 16, 33, 0.78),
+    rgba(10, 22, 43, 0.94)
+  );
+  padding: 1rem;
+  box-shadow:
+    inset 0 0 0 1px rgba(114, 164, 255, 0.08),
+    0 16px 30px rgba(1, 7, 16, 0.36);
+}
+
+.icon-shell {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 2rem;
+  width: 2rem;
+  border-radius: 0.7rem;
+  border: 1px solid rgba(102, 155, 255, 0.42);
+  background: rgba(34, 72, 144, 0.28);
+  color: #b9d5ff;
+  box-shadow: inset 0 0 0 1px rgba(132, 178, 255, 0.08);
+}
+
+.product-card-label {
+  margin-top: 0.7rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #9cb2d8;
+}
+
+.product-card-value {
+  margin-top: 0.2rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #e1edff;
+}
+
+.product-card-copy {
+  margin-top: 0.5rem;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: #9ab0d5;
+}
+
+.kpi-tile {
+  border-radius: 0.85rem;
+  border: 1px solid rgba(93, 145, 255, 0.24);
+  background: rgba(7, 17, 34, 0.82);
+  padding: 0.65rem 0.7rem;
+}
+
+.kpi-label {
+  font-size: 0.63rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #8fa7cf;
+}
+
+.kpi-value {
+  margin-top: 0.2rem;
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #dcedff;
 }
 
 .feed-scroll {

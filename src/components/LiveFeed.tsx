@@ -15,17 +15,6 @@ const formatMinute = (minute?: number) => {
   return `${minute}'`
 }
 
-const formatMetadata = (metadata?: Record<string, unknown>) => {
-  if (!metadata || Object.keys(metadata).length === 0) {
-    return null
-  }
-  try {
-    return JSON.stringify(metadata)
-  } catch {
-    return null
-  }
-}
-
 export const LiveFeed: React.FC<LiveFeedProps> = ({
   messages,
   isActive,
@@ -93,7 +82,6 @@ export const LiveFeed: React.FC<LiveFeedProps> = ({
               ? new Date(msg.createdAt)
               : new Date()
             const minuteLabel = formatMinute(msg.minute)
-            const metadataLabel = formatMetadata(msg.metadata)
             return (
               <div
                 key={msg.id}
@@ -120,11 +108,12 @@ export const LiveFeed: React.FC<LiveFeedProps> = ({
                             {minuteLabel}
                           </span>
                         )}
-                        {msg.sequence !== undefined && msg.sequence !== null && (
-                          <span className="rounded-full border border-blue-300/35 bg-blue-500/10 px-2 py-0.5 font-semibold text-blue-100">
-                            Seq {msg.sequence}
-                          </span>
-                        )}
+                        {msg.sequence !== undefined &&
+                          msg.sequence !== null && (
+                            <span className="rounded-full border border-blue-300/35 bg-blue-500/10 px-2 py-0.5 font-semibold text-blue-100">
+                              Seq {msg.sequence}
+                            </span>
+                          )}
                         {msg.period && (
                           <span className="rounded-full border border-slate-500/40 bg-slate-800/70 px-2 py-0.5 text-slate-300">
                             {msg.period}
@@ -145,11 +134,7 @@ export const LiveFeed: React.FC<LiveFeedProps> = ({
                       <p className="rounded-xl border border-blue-300/22 bg-slate-950/55 p-3 text-sm leading-relaxed text-slate-100">
                         {msg.message}
                       </p>
-                      {metadataLabel && (
-                        <div className="mt-2 rounded-md border border-slate-500/30 bg-slate-950/65 px-2 py-1 font-mono text-[11px] text-slate-400">
-                          {metadataLabel}
-                        </div>
-                      )}
+
                       {msg.tags && msg.tags.length > 0 && (
                         <div className="mt-2 flex flex-wrap gap-2">
                           {msg.tags.map((tag) => (
